@@ -1,0 +1,47 @@
+services:
+  postgres:
+    image: postgres:16
+    environment:
+      POSTGRES_USER: quiet
+      POSTGRES_PASSWORD: quiet
+      POSTGRES_DB: quiet
+    ports:
+      - "5432:5432"
+    volumes:
+      - quiet-pg:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U quiet -d quiet"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+  app:
+    build: .
+    ports:
+      - "3970:3970"
+    environment:
+      DATABASE_URL: postgres://quiet:quiet@postgres:5432/quiet
+      QUIET_SESSION_SECRET: ${QUIET_SESSION_SECRET:-local-only-session-secret-change-me!!}
+      QUIET_ADMIN_EMAIL: ${QUIET_ADMIN_EMAIL:-amara@harbourline.example}
+      QUIET_ADMIN_PASSWORD: ${QUIET_ADMIN_PASSWORD:-Harbourline-local-2026}
+      QUIET_DEV_API_KEY: ${QUIET_DEV_API_KEY:-quiet_demo_harbourline_local_only}
+      QUIET_SEED: ${QUIET_SEED:-demo}
+      QUIET_ALLOW_DEMO_CREDENTIALS: ${QUIET_ALLOW_DEMO_CREDENTIALS:-true}
+      QUIET_GATEWAY_MODE: ${QUIET_GATEWAY_MODE:-decide}
+      QUIET_COOKIE_SECURE: ${QUIET_COOKIE_SECURE:-false}
+      QUIET_WORKSPACE_NAME: ${QUIET_WORKSPACE_NAME:-Harbourline}
+      OPENAI_API_KEY: ${OPENAI_API_KEY:-}
+      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:-}
+      OPENAI_BASE_URL: ${OPENAI_BASE_URL:-https://api.openai.com/v1}
+      OTEL_EXPORTER_OTLP_ENDPOINT: ${OTEL_EXPORTER_OTLP_ENDPOINT:-}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:3970/api/health').then((response) => process.exit(response.ok ? 0 : 1)).catch(() => process.exit(1))"]
+      interval: 10s
+      timeout: 5s
+      retries: 20
+
+volumes:
+  quiet-pg:

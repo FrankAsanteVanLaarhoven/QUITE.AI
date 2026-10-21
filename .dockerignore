@@ -1,0 +1,8 @@
+node_modules
+.next
+.git
+docs/quality/screenshots
+*.log
+.env
+.env.local
+.quiet

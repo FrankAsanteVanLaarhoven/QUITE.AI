@@ -1,0 +1,38 @@
+{
+  "name": "quiet",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Quiet is an AI model router and FinOps control plane.",
+  "scripts": {
+    "dev": "next dev --hostname 127.0.0.1 --port 3970",
+    "build": "DATABASE_URL= next build",
+    "start": "next start --hostname 0.0.0.0 --port 3970",
+    "lint": "eslint",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "check": "pnpm typecheck && pnpm test && pnpm build"
+  },
+  "dependencies": {
+    "@tanstack/react-query": "^5.90.2",
+    "next": "16.3.6",
+    "pg": "^8.16.3",
+    "react": "19.2.8",
+    "react-dom": "19.2.8"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "^4",
+    "@types/node": "^24.13.6",
+    "@types/pg": "^8.15.5",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "eslint": "^9",
+    "eslint-config-next": "16.3.6",
+    "tailwindcss": "^4",
+    "typescript": "^5",
+    "vitest": "^3.2.4"
+  },
+  "packageManager": "pnpm@10.20.0",
+  "engines": {
+    "node": ">=22.5.0"
+  }
+}
