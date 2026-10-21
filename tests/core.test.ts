@@ -4,6 +4,7 @@ import { buildDemoLedger, buildStagingRequests, DEMO_COMMITTED_POUNDS, DEMO_FORE
 import { recommendations, teamStatus } from "@/lib/finops";
 import { formatMicro, formatPercentRatio } from "@/lib/format";
 import { parseCreditPounds } from "@/lib/credits";
+import { validateMember } from "@/lib/members";
 import { poundsToMicro, requestCostMicro } from "@/lib/money";
 import { slugifyWorkspace, validateSignup } from "@/lib/register";
 import { classify } from "@/lib/router/classify";
@@ -155,6 +156,8 @@ describe("signup and credit", () => {
     expect("micro" in parsed ? parsed.micro : 0n).toBe(250_000_000n);
     expect("error" in parseCreditPounds("10.999")).toBe(true);
     expect("error" in parseCreditPounds("0")).toBe(true);
+    expect(validateMember({ name: "Idris Cole", email: "idris@example.com", password: "short", role: "operator" })?.code).toBe("password");
+    expect(validateMember({ name: "Idris Cole", email: "idris@example.com", password: "a-long-local-password", role: "guest" })?.code).toBe("role");
   });
 });
 

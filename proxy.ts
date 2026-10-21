@@ -2,7 +2,7 @@ import { NextResponse, type NextRequest } from "next/server";
 
 export function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
-  const consolePath = ["/overview", "/requests", "/approvals", "/policies", "/teams", "/budgets", "/models", "/audit", "/credits"].some(
+  const consolePath = ["/overview", "/requests", "/approvals", "/policies", "/teams", "/people", "/budgets", "/models", "/audit", "/credits"].some(
     (item) => pathname === item || pathname.startsWith(`${item}/`),
   );
   const hasSession = Boolean(request.cookies.get("quiet_session")?.value);

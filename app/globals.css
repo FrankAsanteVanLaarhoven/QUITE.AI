@@ -249,6 +249,14 @@ fieldset { border: 0; padding: 0; margin: 0; }
   .metrics, .split { grid-template-columns: 1fr; }
   .metric + .metric { border-left: 0; border-top: 1px solid var(--line); }
   .table-wrap { overflow-x: auto; }
+  .table-wrap.fit .table { table-layout: fixed; }
+  .table-wrap.fit th, .table-wrap.fit td { overflow-wrap: anywhere; }
+  .table-wrap.fit.capacity th, .table-wrap.fit.capacity td { overflow-wrap: break-word; padding-left: 6px; padding-right: 6px; }
+  .table-wrap.fit.capacity th { letter-spacing: 0.04em; }
+  .table-wrap.fit.capacity th:nth-child(1), .table-wrap.fit.capacity td:nth-child(1) { width: 34%; }
+  .table-wrap.fit.capacity th:nth-child(2), .table-wrap.fit.capacity td:nth-child(2) { width: 20%; }
+  .table-wrap.fit.capacity th:nth-child(3), .table-wrap.fit.capacity td:nth-child(3) { width: 16%; }
+  .table-wrap.fit.capacity th:nth-child(4), .table-wrap.fit.capacity td:nth-child(4) { width: 30%; }
 }
 @media (prefers-reduced-motion: reduce) {
   * { transition: none !important; animation: none !important; }

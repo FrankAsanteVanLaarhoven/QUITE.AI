@@ -179,4 +179,72 @@ describe.skipIf(!url)("postgres ledger", () => {
     const settled = await postCredit(admin, waiting?.id ?? "");
     expect(settled.balance).toBe("£300");
   });
+
+  it("adds a person to the workspace and keeps one admin", async () => {
+    const { registerWorkspace } = await import("@/lib/register");
+    const { addMember, listMembers, setMemberRole } = await import("@/lib/members");
+    const { HttpError } = await import("@/lib/http");
+    const created = await registerWorkspace({
+      name: "Ada Mensah",
+      email: "ada.people@example.com",
+      password: "a-long-local-password",
+      workspaceName: "People Line",
+    });
+    const admin = { id: created.userId, workspaceId: created.workspaceId, role: "admin" as const, name: "Ada Mensah" };
+    const added = await addMember(admin, {
+      name: "Owen Blake",
+      email: "owen.people@example.com",
+      password: "another-local-password",
+      role: "operator",
+    });
+    expect(added.role).toBe("operator");
+    const members = await listMembers(created.workspaceId);
+    expect(members.map((member) => member.email).sort()).toEqual(["ada.people@example.com", "owen.people@example.com"]);
+    await expect(addMember({ ...admin, role: "reviewer" }, {
+      name: "No Access",
+      email: "no.access@example.com",
+      password: "another-local-password",
+      role: "reviewer",
+    })).rejects.toBeInstanceOf(HttpError);
+    await setMemberRole(admin, added.id, "finance");
+    expect((await listMembers(created.workspaceId)).find((member) => member.id === added.id)?.role).toBe("finance");
+    await expect(setMemberRole(admin, created.userId, "reviewer")).rejects.toMatchObject({ code: "last_admin" });
+    expect((await listMembers(created.workspaceId)).find((member) => member.id === created.userId)?.role).toBe("admin");
+  });
+
+  it("places a person on a team without changing purchased seats", async () => {
+    const { registerWorkspace } = await import("@/lib/register");
+    const { addMember, listMembers, setMemberTeam } = await import("@/lib/members");
+    const { listTeams } = await import("@/lib/service");
+    const { HttpError } = await import("@/lib/http");
+    const created = await registerWorkspace({
+      name: "Leah Mensah",
+      email: "leah.seats@example.com",
+      password: "a-long-local-password",
+      workspaceName: "Seat Line",
+    });
+    const admin = { id: created.userId, workspaceId: created.workspaceId, role: "admin" as const, name: "Leah Mensah" };
+    const added = await addMember(admin, {
+      name: "Noah Blake",
+      email: "noah.seats@example.com",
+      password: "another-local-password",
+      role: "reviewer",
+    });
+    const before = await listTeams(created.workspaceId);
+    const general = before.find((team) => team.slug === "general");
+    expect(general?.seats).toBe(0);
+    const placed = await setMemberTeam(admin, added.id, "general");
+    expect(placed.seats).toBe(0);
+    expect(placed.filled).toBe(1);
+    expect(placed.notice).toContain("does not add one");
+    const after = await listTeams(created.workspaceId);
+    expect(after.find((team) => team.slug === "general")?.seats).toBe(0);
+    expect(after.find((team) => team.slug === "general")?.filled).toBe(1);
+    expect((await listMembers(created.workspaceId)).find((member) => member.id === added.id)?.teamSlug).toBe("general");
+    const cleared = await setMemberTeam(admin, added.id, null);
+    expect(cleared.teamSlug).toBeNull();
+    expect((await listTeams(created.workspaceId)).find((team) => team.slug === "general")?.filled).toBe(0);
+    await expect(setMemberTeam(admin, added.id, "missing")).rejects.toMatchObject({ code: "not_found" });
+    await expect(setMemberTeam({ ...admin, role: "reviewer" }, added.id, "general")).rejects.toBeInstanceOf(HttpError);
+  });
 });

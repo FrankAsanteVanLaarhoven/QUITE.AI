@@ -28,7 +28,7 @@ export function AuditScreen() {
         <div>
           <p className="label">Record</p>
           <h1 className="section-title">Audit</h1>
-          <p className="lede">Quiet records who changed a route, policy, allowance, model, or key. Prompt bodies are not stored. A hash is.</p>
+          <p className="lede">Quiet records who changed a route, policy, allowance, model, key, person, or team placement. Prompt bodies are not stored. A hash is.</p>
         </div>
         <div className="table-wrap">
           <table className="table">

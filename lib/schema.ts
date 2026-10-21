@@ -189,4 +189,12 @@ CREATE TABLE IF NOT EXISTS credit_entries (
 );
 
 CREATE INDEX IF NOT EXISTS credit_entries_lookup ON credit_entries (workspace_id, created_at DESC);
+
+CREATE TABLE IF NOT EXISTS team_members (
+  workspace_id uuid NOT NULL REFERENCES workspaces(id),
+  user_id uuid PRIMARY KEY REFERENCES users(id) ON DELETE CASCADE,
+  team_id uuid NOT NULL REFERENCES teams(id) ON DELETE CASCADE
+);
+
+CREATE INDEX IF NOT EXISTS team_members_team ON team_members (team_id);
 `;

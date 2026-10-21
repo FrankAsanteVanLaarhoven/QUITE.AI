@@ -41,7 +41,7 @@ export function TeamsScreen() {
   const panel = useMemo(() => current ? {
     title: current.name,
     sections: [
-      { label: "Seats", text: String(current.seats) },
+      { label: "Seats", text: `${current.filled ?? 0} people placed. ${current.seats} purchased seats.` },
       { label: "Allowance", text: current.allowance },
       { label: "Slug", text: current.slug },
     ],
@@ -54,15 +54,16 @@ export function TeamsScreen() {
         <div>
           <p className="label">Capacity</p>
           <h1 className="section-title">Teams and seats</h1>
-          <p className="lede">An allowance is the monthly cap Quiet uses for budget guard and chargeback. Seats of zero mark shared platform cost.</p>
+          <p className="lede">An allowance is the monthly cap Quiet uses for budget guard and chargeback. Seats are the purchased count. Filled is the people placed on the team, and placing someone does not change that count. Seats of zero mark shared platform cost.</p>
         </div>
-        <div className="table-wrap">
+        <div className="table-wrap fit capacity">
           <table className="table">
-            <thead><tr><th>Team</th><th>Seats</th><th>Allowance</th></tr></thead>
+            <thead><tr><th>Team</th><th>Filled</th><th>Seats</th><th>Allowance</th></tr></thead>
             <tbody>
-              {teams.length === 0 ? <tr><td colSpan={3}>No teams yet.</td></tr> : teams.map((team) => (
+              {teams.length === 0 ? <tr><td colSpan={4}>No teams yet.</td></tr> : teams.map((team) => (
                 <tr key={team.slug} aria-selected={team.slug === current?.slug}>
                   <td><button className="row-button" type="button" onClick={() => { setSlug(team.slug); setAllowance(""); }}>{team.name}</button></td>
+                  <td className="num">{team.filled ?? 0}</td>
                   <td className="num">{team.seats}</td>
                   <td className="num">{team.allowance}</td>
                 </tr>

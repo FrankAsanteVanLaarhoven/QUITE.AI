@@ -58,6 +58,33 @@ Checked on 21 October 2026 against `pnpm start` at http://127.0.0.1:3970 after t
 - Samir (reviewer) can request a purchase. Add credit stayed disabled and the balance stayed £0 until Amara recorded the £40.00 row. The balance then read “Credit £40.00” and “No card was charged.”
 - Headless Chrome recorded no console errors on the landing pass. The only failed document response in that pass was the intentional 404.
 
-Known gaps: the container image has not been built on this machine. A public production release is not claimed. `docker info` exited 1, so the image check stays BLOCKED.
+## People
 
-Release-ready claim: the applicable local checks pass. The Docker image build remains blocked until a Docker daemon is available.
+Checked on 21 October 2026 against `pnpm start` at http://127.0.0.1:3970.
+
+- `GET /people` without a session redirects to `/login`. The signed-in title is `People · Quiet`, with one `h1`.
+- An admin added an operator in the Harbourline workspace. The password field cleared after save, and the notice said Quiet did not send an email. That operator’s sign-in returned 200. The password is not in this review.
+- Changing the only admin to reviewer returned 409 “Quiet needs at least one admin in this workspace.” The admin role stayed.
+- Desktop overflow was 0. At 390px the name, email, and role columns stay inside the viewport (role heading right edge 374 of 390) and page overflow was 0. Screenshots `51-people-desktop.png` and `54-people-mobile-fit.png`.
+- Integration test on `quiet_test` adds a person, blocks a reviewer from adding, changes a role, and refuses to remove the last admin.
+- Headless Chrome recorded no console errors on this pass. The 409 above is the last-admin refusal.
+
+## Team placement
+
+Checked on 21 October 2026 against the rebuilt `pnpm start` at http://127.0.0.1:3970. Purchased seats stay on the team. Placement is a separate count.
+
+- An admin placed the existing operator on Support. The notice was “Placed on Support. Purchased seats stay 120.” The People row showed Support. Teams showed Support filled 1 and seats 120. Clearing the placement said “Removed from the team. Purchased seats were not changed.” Placing them again restored filled 1 and seats 120.
+- The overview heading stayed “You saved £18,700 this month while maintaining 96% quality.” Spent stayed £31,240, forecast £44,900, and the team seat counts stayed 120, 85, 65, 40, and 0. Credit balance stayed £40.00. Approvals stayed 3.
+- A reviewer saw the same People list. Add person and Place on team were disabled, with the note that only an admin can add a person, change a role, or place them on a team. A direct placement POST returned 403 “Your role cannot do that. Ask a workspace admin if you need access.”
+- Titles were `People · Quiet` and `Teams and seats · Quiet`, each with one `h1`. Desktop overflow was 0 at 1440. At 390px the People team heading ended at 374 of 390, and the Teams allowance heading ended at 374 of 390, with overflow 0. At 768px Teams overflow was 0 and Allowance ended at 744. Team names and the allowance amounts stayed on one line. Screenshots `55-people-team-desktop.png`, `56-teams-filled-desktop.png`, `58-people-team-mobile.png`, `60-teams-mobile.png`, and `63-teams-tablet.png`.
+- The audit list contained four `member.team` events for this check, target type `user`, with team `support` or `null`. No password was stored.
+- `quiet_test` integration test “places a person on a team without changing purchased seats” passed with the other four integration tests. Core tests were 10 passed. `pnpm exec tsc --noEmit` and `pnpm lint` passed. `DATABASE_URL= pnpm build` did not connect to Postgres. `/people` and `/teams` stayed dynamic.
+- This build has 26 client JS files, 0 source maps, gzip total 230,898 bytes, largest chunk 71,452 bytes. That is inside the recorded budget of 250 KB gzip total and 120 KB for one chunk.
+- The placement flow recorded no console error. The only console lines were from the deliberate reviewer POST: the 403 resource failure and one “Uncaught (in promise)” tied to that request.
+- The place button returned to “Place on team” after the notice. The pending label was not held long enough to observe.
+
+This slice, recorded only where it was exercised: Q02, Q10, Q11, Q12 for the team placement control, Q14, Q16, Q17, Q18, Q19, and Q20 pass on the evidence above. Q01, Q03, Q05, Q06, and Q07 stay N/A for this private local app. Q09’s pending state was not observed. Q04, Q08, and Q13 were not retested in this slice.
+
+Known gaps: the container image has not been built on this machine. A public production release is not claimed. `docker info` exited 1 on 21 October 2026, so the image check stays BLOCKED.
+
+Local claim: the checks exercised above pass for this private app. The pending label on placement was not observed, and the Docker image build remains blocked until a daemon is available. A public production release is not claimed.

@@ -3,6 +3,7 @@ import { NextResponse } from "next/server";
 import { appConfig } from "@/lib/config";
 import { createSession, destroySession, findSession, verifyPassword } from "@/lib/auth";
 import { getCredits, postCredit, recordCredit } from "@/lib/credits";
+import { addMember, listMembers, setMemberRole, setMemberTeam } from "@/lib/members";
 import { registerWorkspace } from "@/lib/register";
 import { query } from "@/lib/db";
 import { boot, ensureBoot } from "@/lib/bootstrap";
@@ -92,6 +93,18 @@ export async function dispatch(method: string, request: Request, path: string[])
         await setModelAllowed(actor, path[1], Boolean(body.allowed));
         return { ok: true };
       });
+    }
+    if (method === "GET" && key === "people") return json(200, { members: await listMembers(user.workspaceId), canManage: user.role === "admin" });
+    if (method === "POST" && key === "people") {
+      return await act(actor, ["admin"], async () => addMember(actor, await readJson(request)));
+    }
+    if (method === "POST" && path[0] === "people" && path[2] === "role") {
+      const body = await readJson<{ role?: string }>(request);
+      return await act(actor, ["admin"], async () => setMemberRole(actor, path[1] ?? "", body.role ?? ""));
+    }
+    if (method === "POST" && path[0] === "people" && path[2] === "team") {
+      const body = await readJson<{ teamSlug?: string | null }>(request);
+      return await act(actor, ["admin"], async () => setMemberTeam(actor, path[1] ?? "", body.teamSlug ?? null));
     }
     if (method === "GET" && key === "teams") return json(200, { teams: await listTeams(user.workspaceId) });
     if (method === "POST" && key === "teams") return await act(actor, MONEY_ROLES, async () => {

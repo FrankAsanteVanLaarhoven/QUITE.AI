@@ -18,7 +18,7 @@ pnpm install
 pnpm dev
 ```
 
-Open `http://127.0.0.1:3970` for the front door. Sign in or create a workspace there. The control room is `/overview`.
+Open `http://127.0.0.1:3970` for the front door. Sign in or create a workspace there. The control room is `/overview`. An admin adds people on `/people` and can place them on a team. Placement does not change purchased seats. Quiet does not email the password.
 
 The local demo workspace is Harbourline. Sign in as `amara@harbourline.example` with `Harbourline-local-2026`. The same password signs in the reviewer `samir@harbourline.example`. The local gateway key is `quiet_demo_harbourline_local_only`. These credentials exist only when demo seeding is allowed. Replace them before any shared host, and set `QUIET_COOKIE_SECURE=true` behind HTTPS.
 

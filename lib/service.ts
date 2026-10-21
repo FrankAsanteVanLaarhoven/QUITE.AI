@@ -334,10 +334,12 @@ export async function setModelAllowed(actor: SessionRef, slug: string, allowed: 
 }
 
 export async function listTeams(workspaceId: string) {
-  return query<{ slug: string; name: string; seats: number; allowance: string }>(
-    `SELECT slug, name, seats, allowance_micro::text AS allowance FROM teams WHERE workspace_id = $1 ORDER BY seats DESC, name`,
+  return query<{ slug: string; name: string; seats: number; allowance: string; filled: number }>(
+    `SELECT t.slug, t.name, t.seats, t.allowance_micro::text AS allowance,
+            (SELECT count(*)::int FROM team_members m WHERE m.team_id = t.id) AS filled
+     FROM teams t WHERE t.workspace_id = $1 ORDER BY t.seats DESC, t.name`,
     [workspaceId],
-  ).then((rows) => rows.map((team) => ({ ...team, allowance: formatMicro(micro(team.allowance)) })));
+  ).then((rows) => rows.map((team) => ({ ...team, allowance: formatMicro(micro(team.allowance)), filled: Number(team.filled) })));
 }
 
 export async function createTeam(actor: SessionRef, input: { name: string; seats: number; allowancePounds: number }) {

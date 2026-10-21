@@ -91,7 +91,7 @@ export type ModelView = {
   output: string;
 };
 
-export type TeamAccount = { slug: string; name: string; seats: number; allowance: string };
+export type TeamAccount = { slug: string; name: string; seats: number; allowance: string; filled?: number };
 
 export type AuditEvent = {
   id: string;
@@ -128,7 +128,7 @@ export function statusText(status: string): string {
   return status.replaceAll("_", " ");
 }
 
-export function can(role: string, action: "route" | "write" | "money" | "export" | "keys"): boolean {
+export function can(role: string, action: "route" | "write" | "money" | "export" | "keys" | "people"): boolean {
   if (action === "route") return role === "admin" || role === "operator" || role === "finance";
   if (action === "write") return role === "admin" || role === "operator";
   if (action === "money") return role === "admin" || role === "finance";
